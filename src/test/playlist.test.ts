@@ -1,16 +1,16 @@
 import { test, expect } from 'vitest';
-import { listMusicsFromPlaylist } from '../listMusicsFromPlaylist.js';
-import { searchPlaylists } from '../searchPlaylists.js';
+import { ListMusicVideosFromPlaylist } from '../listMusicsFromPlaylist.js';
+import { SearchForPlaylists } from '../searchPlaylists.js';
 
 test('Search for Jazz playlists and the first one should return a list of results', async () => {
   const query = 'jazz';
 
-  const results = await searchPlaylists(query);
+  const results = await SearchForPlaylists(query);
   expect(results.length).toBeGreaterThan(1);
   const firstPlaylist = results.shift();
   expect(firstPlaylist).toBeDefined();
   expect(firstPlaylist?.playlistId).toBeDefined();
-  const songsResult = await listMusicsFromPlaylist(
+  const songsResult = await ListMusicVideosFromPlaylist(
     firstPlaylist?.playlistId ?? ''
   );
   console.log(firstPlaylist?.playlistId);

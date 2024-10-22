@@ -521,7 +521,7 @@ export const parseAlbumItem = (content: {
 };
 
 export const parseAlbumHeader = (content: {
-  musicDetailHeaderRenderer: {
+  musicResponsiveHeaderRenderer: {
     title: {
       runs: {
         text: string;
@@ -533,7 +533,7 @@ export const parseAlbumHeader = (content: {
       }[];
     };
     thumbnail: {
-      croppedSquareThumbnailRenderer: {
+      musicThumbnailRenderer: {
         thumbnail: {
           thumbnails: {
             url: string;
@@ -545,20 +545,20 @@ export const parseAlbumHeader = (content: {
 }): any => {
   let artist;
   try {
-    artist = content.musicDetailHeaderRenderer.subtitle.runs[2].text;
+    artist = content.musicResponsiveHeaderRenderer.subtitle.runs[2].text;
   } catch (err) {
     console.error("Couldn't parse artist from album header", err);
   }
   let album;
   try {
-    album = content.musicDetailHeaderRenderer.title.runs[0].text;
+    album = content.musicResponsiveHeaderRenderer.title.runs[0].text;
   } catch (err) {
     console.error("Couldn't parse title from album header", err);
   }
   let thumbnailUrl;
   try {
     thumbnailUrl =
-      content.musicDetailHeaderRenderer.thumbnail.croppedSquareThumbnailRenderer.thumbnail.thumbnails.pop()
+      content.musicResponsiveHeaderRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()
         ?.url;
   } catch (err) {
     console.error("Couldn't parse thumbnailUrl from album header", err);

@@ -9,9 +9,7 @@ export const parseSearchMusicsBody = (body: {
   const { contents } =
     body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
       .musicShelfRenderer;
-
   const results: MusicVideo[] = [];
-
   contents.forEach((content: any) => {
     try {
       const song = parseMusicItem(content);
@@ -25,25 +23,34 @@ export const parseSearchMusicsBody = (body: {
   return results;
 };
 
-export async function searchMusics(query: string): Promise<MusicVideo[]> {
-  const response = await got.post(
-    'https://music.youtube.com/youtubei/v1/search?alt=json',
-    {
-      json: {
-        ...context.body,
-        params: 'EgWKAQIIAWoKEAoQCRADEAQQBQ%3D%3D',
-        query,
-      },
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-        origin: 'https://music.youtube.com',
-      },
-    }
-  );
+export async function SearchForMusicVideos(query: string): Promise<MusicVideo[]> {
+  const url = 'https://music.youtube.com/youtubei/v1/search?alt=json';
+  const body = {
+    ...context.body,
+    params: 'EgWKAQIIAWoKEAoQCRADEAQQBQ%3D%3D',
+    query,
+    originalQuery: query,
+    searchMethod: "ENTER_KEY",
+    validationStatus: "VALID",
+  };
+
+  const headers = {
+    'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    'Origin': 'https://music.youtube.com',
+  };
+
+  const options: any = {
+    method: 'POST',
+    headers,
+    json: body,
+    responseType: 'json',
+  };
+
   try {
-    return parseSearchMusicsBody(JSON.parse(response.body));
-  } catch {
+    const response = await got(url, options);    
+    return parseSearchMusicsBody(response.body as any);
+  } catch (error) {
+    console.error('Error fetching data:', error);
     return [];
   }
 }

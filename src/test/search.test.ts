@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { searchMusics } from '../searchMusics.js';
+import { SearchForMusicVideos } from '../searchMusics.js';
 
 test('Search human readable queries should return a list of results', async () => {
   const queries = [
@@ -10,7 +10,7 @@ test('Search human readable queries should return a list of results', async () =
   ];
 
   const results = await Promise.all(
-    queries.map((query) => searchMusics(query))
+    queries.map((query) => SearchForMusicVideos(query))
   );
   results.forEach((result) => {
     expect(result.length).toBeGreaterThan(1);

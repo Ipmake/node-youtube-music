@@ -10,14 +10,10 @@ export const parseSearchPlaylistsBody = (
   const contents =
     body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
       .musicShelfRenderer?.contents;
-
   if (!contents) {
     return [];
   }
-
-
   const results: PlaylistPreview[] = [];
-
   contents.forEach((content: any) => {
     try {
       const playlist = parsePlaylistItem(content, onlyOfficialPlaylists);
@@ -31,27 +27,32 @@ export const parseSearchPlaylistsBody = (
   return results;
 };
 
-export async function searchPlaylists(
+export async function SearchForPlaylists(
   query: string,
   options?: {
     onlyOfficialPlaylists?: boolean;
   }
 ): Promise<PlaylistPreview[]> {
   const response = await got.post(
-    'https://music.youtube.com/youtubei/v1/search?alt=json&key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+    'https://music.youtube.com/youtubei/v1/search',
     {
       json: {
         ...context.body,
         params: 'EgWKAQIoAWoKEAoQAxAEEAUQCQ%3D%3D',
         query,
       },
+      searchParams: {
+        alt: 'json',
+        key: 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
+      },
       headers: {
         'User-Agent':
           'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
         origin: 'https://music.youtube.com',
-      },
+      }
     }
   );
+
   try {
     return parseSearchPlaylistsBody(
       JSON.parse(response.body),

@@ -1,12 +1,12 @@
 import { test, expect } from 'vitest';
 import { getArtist } from '../getArtist.js';
-import { searchArtists } from '../searchArtists.js';
-import { searchMusics } from '../searchMusics.js';
+import { SearchForArtists } from '../searchArtists.js';
+import { SearchForMusicVideos } from '../searchMusics.js';
 
 test('Search for Dua Lipa and get more data', async () => {
   const query = 'Dua Lipa';
 
-  const results = await searchArtists(query);
+  const results = await SearchForArtists(query);
   expect(results.length).toBeGreaterThanOrEqual(1);
   const firstResult = results[0];
   expect(firstResult).toBeDefined();
@@ -20,7 +20,7 @@ test('Search for Dua Lipa and get more data', async () => {
 test('Parse artist for songs whose artist does not have a navigationEndpoint', async () => {
   const query = 'Running in the 90s';
 
-  const results = await searchMusics(query);
+  const results = await SearchForMusicVideos(query);
   expect(results.length).toBeGreaterThanOrEqual(1);
   const firstResult = results[0];
   expect(firstResult).toBeDefined();
