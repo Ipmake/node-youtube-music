@@ -27,7 +27,9 @@ export async function getPlaylist(
   );
 
   try {
-    return parsePlaylist((JSON.parse(response.body)).contents);
+    const data = parsePlaylist((JSON.parse(response.body)).contents);
+    if(data) data.id = playlistId;
+    return data;
   } catch (e) {
     console.error(e);
     return null;
