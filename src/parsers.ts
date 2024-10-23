@@ -6,6 +6,8 @@ import {
   ArtistPreview,
   PageType,
   AlbumType,
+  Playlist,
+  PlaylistTrack,
 } from './models.js';
 
 const explicitBadgeText = 'MUSIC_EXPLICIT_BADGE';
@@ -64,8 +66,15 @@ export const parseMusicItem = (content: {
           runs: {
             text: string;
             navigationEndpoint: {
-              watchEndpoint: { videoId: string };
-              browseId: string;
+              browseEndpoint?: {
+                browseId: string;
+                browseEndpointContextSupportedConfigs: {
+                  browseEndpointContextMusicConfig: {
+                    pageType: string
+                  }
+                }
+              };
+              watchEndpoint?: { videoId: string };
             };
           }[];
         };
@@ -90,7 +99,7 @@ export const parseMusicItem = (content: {
     youtubeId =
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0]
-        .navigationEndpoint.watchEndpoint.videoId;
+        .navigationEndpoint.watchEndpoint?.videoId;
   } catch (err) {}
 
   let title;
@@ -113,9 +122,12 @@ export const parseMusicItem = (content: {
     const { length } =
       content.musicResponsiveListItemRenderer.flexColumns[1]
         .musicResponsiveListItemFlexColumnRenderer.text.runs;
-    album =
-      content.musicResponsiveListItemRenderer.flexColumns[1]
-        .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].text;
+    album = {
+      name: content.musicResponsiveListItemRenderer.flexColumns[1]
+      .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].text,
+      id: content.musicResponsiveListItemRenderer.flexColumns[1]
+      .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].navigationEndpoint.browseEndpoint?.browseId,
+    }
   } catch (err) {}
 
   let thumbnailUrl;
@@ -188,7 +200,9 @@ export const parseSuggestionItem = (content: {
 
   let album;
   try {
-    album = content.playlistPanelVideoRenderer.longBylineText.runs[2].text;
+    album = {
+      name: content.playlistPanelVideoRenderer.longBylineText.runs[2].text
+    }
   } catch (err) {}
 
   let isExplicit;
@@ -291,6 +305,287 @@ export const parsePlaylistItem = (
   };
 };
 
+export const parsePlaylist = (
+  contents: {
+    twoColumnBrowseResultsRenderer: {
+      secondaryContents: {
+        sectionListRenderer: {
+          contents: {
+            musicShelfRenderer?: {
+              contents: {
+                musicResponsiveListItemRenderer: {
+                  overlay: {
+                    musicItemThumbnailOverlayRenderer: {
+                      content: {
+                        musicPlayButtonRenderer: {
+                          playNavigationEndpoint: {
+                            watchEndpoint: {
+                              videoId: string;
+                              playlistId: string;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  };
+                  flexColumns: {
+                    musicResponsiveListItemFlexColumnRenderer: {
+                      text: {
+                        runs: {
+                          text: string;
+                          navigationEndpoint: {
+                            watchEndpoint?: {
+                              videoId: string;
+                              playlistId: string;
+                            },
+                            browseEndpoint?: {
+                              browseId: string;
+                              browseEndpointContextSupportedConfigs: {
+                                browseEndpointContextMusicConfig: {
+                                  pageType: string;
+                                }
+                              }
+                            }
+                          }
+                        }[];
+                      }
+                    }
+                  }[];
+                  fixedColumns: {
+                    musicResponsiveListItemFixedColumnRenderer: {
+                      text: {
+                        runs: {
+                          text: string;
+                        }[];
+                      }
+                    }
+                  }[];
+                }
+              }[];
+            };
+            musicPlaylistShelfRenderer?: {
+              contents: {
+                musicResponsiveListItemRenderer: {
+                  overlay: {
+                    musicItemThumbnailOverlayRenderer: {
+                      content: {
+                        musicPlayButtonRenderer: {
+                          playNavigationEndpoint: {
+                            watchEndpoint: {
+                              videoId: string;
+                              playlistId: string;
+                            }
+                          }
+                        }
+                      }
+                    }
+                  };
+                  flexColumns: {
+                    musicResponsiveListItemFlexColumnRenderer: {
+                      text: {
+                        runs: {
+                          text: string;
+                          navigationEndpoint: {
+                            watchEndpoint?: {
+                              videoId: string;
+                              playlistId: string;
+                            },
+                            browseEndpoint?: {
+                              browseId: string;
+                              browseEndpointContextSupportedConfigs: {
+                                browseEndpointContextMusicConfig: {
+                                  pageType: string;
+                                }
+                              }
+                            }
+                          }
+                        }[];
+                      }
+                    }
+                  }[];
+                  fixedColumns: {
+                    musicResponsiveListItemFixedColumnRenderer: {
+                      text: {
+                        runs: {
+                          text: string;
+                        }[];
+                      }
+                    }
+                  }[];
+                }
+              }[];
+            }
+          }[];
+        }
+      };
+      tabs: {
+        tabRenderer: {
+          content: {
+            sectionListRenderer: {
+              contents: {
+                musicResponsiveHeaderRenderer: {
+                  thumbnail: {
+                    musicThumbnailRenderer: {
+                      thumbnail: {
+                        thumbnails: {
+                          url: string;
+                          width: number;
+                          height: number;
+                        }[];
+                      }
+                    }
+                  };
+                  buttons: {
+                    musicPlayButtonRenderer?: {
+                      playNavigationEndpoint: {
+                        watchEndpoint: {
+                          videoId: string;
+                          playlistId: string;
+                        }
+                      }
+                    }
+                  }[];
+                  title: {
+                    runs: {
+                      text: string;
+                    }[];
+                  };
+                  subtitle: {
+                    runs: {
+                      text: string;
+                    }[];
+                  };
+                  straplineTextOne?: {
+                    runs: {
+                      text: string;
+                      navigationEndpoint?: {
+                        browseEndpoint: {
+                          browseId: string;
+                        }
+                      }
+                    }[];
+                  };
+                  straplineThumbnail?: {
+                    musicThumbnailRenderer: {
+                      thumbnail: {
+                        thumbnails: {
+                          url: string;
+                          width: number;
+                          height: number;
+                        }[];
+                      }
+                    }
+                  };
+                  secondSubtitle: {
+                    runs: {
+                      text: string;
+                    }[];
+                  }
+                }
+              }[];
+            }
+          }
+        }
+      }[];
+    },
+  }
+): Playlist | null => {
+  let playlistId;
+  try {
+    playlistId = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+      .buttons[1].musicPlayButtonRenderer?.playNavigationEndpoint.watchEndpoint.playlistId;
+  } catch (err) {}
+
+  let title;
+  try {
+    title = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+      .title.runs[0].text;
+  } catch (err) {}
+
+  let type;
+  try {
+    type = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+      .subtitle.runs[0].text;
+  } catch (err) {}
+
+  let year;
+  try {
+    year =contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+      .subtitle.runs[2].text;
+  } catch (err) {}
+
+  let thumbnailUrl;
+  try {
+    thumbnailUrl = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+      .thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url;
+  } catch (err) {}
+
+  let durationStr;
+  try {
+    durationStr = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+    .secondSubtitle.runs[2].text;
+  } catch (err) {}
+
+  let tracks: any[] = [];
+  try {
+    (contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer.contents[0].musicShelfRenderer ?? contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer.contents[0].musicPlaylistShelfRenderer)?.contents
+    .forEach((content) => {
+      let data: PlaylistTrack = {
+        id: '',
+        title: '',
+        durationStr: '',
+        artist: undefined,
+        album: undefined,
+      };
+
+      if(!content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint?.watchEndpoint?.videoId) return;
+
+      data.id = content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint?.watchEndpoint?.videoId;
+      data.title = content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+      data.durationStr = content.musicResponsiveListItemRenderer.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs[0].text;
+
+      if(content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0].navigationEndpoint) {
+        data.artist = {
+          artistId: content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint?.browseId,
+          name: content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+        }
+      }
+
+      if(content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0].navigationEndpoint) {
+        data.album = {
+          albumId: content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint?.browseId,
+          title: content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+        }
+      }
+
+      tracks.push(data);
+    })
+  } catch (err) {
+    console.error(err);
+  }
+
+  let author;
+  try {
+    const content = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+    author = {
+      id:  content.straplineTextOne?.runs[0].navigationEndpoint?.browseEndpoint.browseId,
+      name: content.straplineTextOne?.runs[0].text ?? "YouTube Music",
+      thumbnailUrl: content.straplineThumbnail?.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url,
+    }
+  } catch (err) {}
+
+  return {
+    id: playlistId as string,
+    title: title as string,
+    type: type as string,
+    year: year as string,
+    thumbnailUrl: thumbnailUrl as string,
+    durationStr: durationStr as string,
+    tracks: tracks,
+    author: author as any,
+  }
+};
+
 export const parseMusicInPlaylistItem = (content: {
   musicResponsiveListItemRenderer: {
     thumbnail: {
@@ -349,9 +644,10 @@ export const parseMusicInPlaylistItem = (content: {
 
   let album;
   try {
-    album =
-      content.musicResponsiveListItemRenderer.flexColumns[2]
-        .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+    album = {
+      name: content.musicResponsiveListItemRenderer.flexColumns[2]
+      .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+    }
   } catch (err) {}
 
   let thumbnailUrl;

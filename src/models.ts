@@ -20,7 +20,7 @@ export interface MusicVideo {
   title?: string;
   thumbnailUrl?: string;
   artists?: {name:string; id?:string}[];
-  album?: string;
+  album?: {name:string; id?:string}
   isExplicit?: boolean;
   duration?: {
     label: string;
@@ -63,4 +63,27 @@ export interface PlaylistPreview {
   title?: string;
   thumbnailUrl?: string;
   totalSongs?: number;
+}
+
+export interface Playlist {
+  id: string;
+  title: string;
+  type: string;
+  year: string;
+  thumbnailUrl: string;
+  durationStr: string;
+  tracks: PlaylistTrack[];
+  author: {
+    id?: string;
+    name: string;
+    thumbnailUrl?: string;
+  }
+}
+
+export interface PlaylistTrack {
+  id: string;
+  title: string;
+  durationStr: string;
+  artist?: ArtistPreview;
+  album?: AlbumPreview;
 }
