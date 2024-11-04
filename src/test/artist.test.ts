@@ -26,3 +26,15 @@ test('Parse artist for songs whose artist does not have a navigationEndpoint', a
   expect(firstResult).toBeDefined();
   expect(firstResult.artists?.length).toBeGreaterThanOrEqual(1);
 });
+
+test('Test set artist by id', async () => {
+  const artistId = 'UCXFEPK5iEJ1MQQmjfleJxlA';
+
+  const data = await getArtist(artistId);
+  expect(data).toBeDefined();
+  expect(data.artistId).toBe(artistId);
+  expect(data.suggestedArtists?.length).toBeGreaterThanOrEqual(1);
+  expect(data.songs?.length).toBeGreaterThanOrEqual(1);
+  expect(data.albums?.length).toBeGreaterThanOrEqual(1);
+  expect(data.singles?.length).toBeGreaterThanOrEqual(1);
+});

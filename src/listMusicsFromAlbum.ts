@@ -1,7 +1,7 @@
-import got from 'got';
 import context from './context.js';
 import { MusicVideo } from './models.js';
 import { parseAlbumHeader, parseMusicInAlbumItem } from './parsers.js';
+import axios from 'axios';
 
 export const parseListMusicsFromAlbumBody = (body: any): MusicVideo[] => {
   const { contents } =
@@ -28,14 +28,14 @@ export async function ListMusicVideosFromAlbum(
   albumId: string
 ): Promise<MusicVideo[]> {
   try {
-    const response = await got.post(
+    const response = await axios.post(
       'https://music.youtube.com/youtubei/v1/browse',
       {
-        json: {
-          ...context.body,
-          browseId: albumId,
-        },
-        searchParams: {
+        ...context.body,
+        browseId: albumId,
+      }, 
+      {
+        params: {
           alt: 'json',
           key: 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
         },
@@ -47,7 +47,7 @@ export async function ListMusicVideosFromAlbum(
       }
     );
 
-    return parseListMusicsFromAlbumBody(JSON.parse(response.body));
+    return parseListMusicsFromAlbumBody(response.data);
   } catch (e) {
     console.error(e);
     return [];

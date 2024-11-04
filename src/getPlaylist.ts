@@ -1,7 +1,7 @@
-import got from 'got';
 import context from './context.js';
 import { Playlist } from './models.js';
 import { parseAlbumItem, parseArtistData, parsePlaylist, parsePlaylistItem } from './parsers.js';
+import axios from 'axios';
 
 export async function getPlaylist(
   playlistId: string,
@@ -10,13 +10,13 @@ export async function getPlaylist(
     country: string;
   }
 ): Promise<Playlist | null> {
-  const response = await got.post(
+  const response = await axios.post(
     'https://music.youtube.com/youtubei/v1/browse?key=AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
     {
-      json: {
-        ...context.body,
-        browseId: playlistId,
-      },
+      ...context.body,
+      browseId: playlistId
+    },
+    {
       headers: {
         'User-Agent':
           'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
@@ -27,7 +27,7 @@ export async function getPlaylist(
   );
 
   try {
-    const data = parsePlaylist((JSON.parse(response.body)).contents);
+    const data = parsePlaylist(response.data.contents);
     if(data) data.id = playlistId;
     return data;
   } catch (e) {

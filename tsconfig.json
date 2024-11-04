@@ -16,7 +16,7 @@
     "outDir": "dist",
     "allowJs": true,
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node"
   },
   "include": ["src/**/*"],

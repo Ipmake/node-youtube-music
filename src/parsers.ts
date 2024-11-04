@@ -8,6 +8,7 @@ import {
   AlbumType,
   Playlist,
   PlaylistTrack,
+  MusicVideoPlayable,
 } from './models.js';
 
 const explicitBadgeText = 'MUSIC_EXPLICIT_BADGE';
@@ -16,8 +17,8 @@ const parseDuration = (durationLabel: string): number => {
   const durationList = durationLabel.split(':');
   return durationList.length === 3
     ? parseInt(durationList[0], 10) * 3600 +
-        parseInt(durationList[1], 10) * 60 +
-        parseInt(durationList[2], 10)
+    parseInt(durationList[1], 10) * 60 +
+    parseInt(durationList[2], 10)
     : parseInt(durationList[0], 10) * 60 + parseInt(durationList[1], 10);
 };
 
@@ -100,14 +101,14 @@ export const parseMusicItem = (content: {
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0]
         .navigationEndpoint.watchEndpoint?.videoId;
-  } catch (err) {}
+  } catch (err) { }
 
   let title;
   try {
     title =
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let artists;
   try {
@@ -115,7 +116,7 @@ export const parseMusicItem = (content: {
       content.musicResponsiveListItemRenderer.flexColumns[1]
         .musicResponsiveListItemFlexColumnRenderer.text.runs
     );
-  } catch (err) {}
+  } catch (err) { }
 
   let album;
   try {
@@ -124,18 +125,18 @@ export const parseMusicItem = (content: {
         .musicResponsiveListItemFlexColumnRenderer.text.runs;
     album = {
       name: content.musicResponsiveListItemRenderer.flexColumns[1]
-      .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].text,
+        .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].text,
       id: content.musicResponsiveListItemRenderer.flexColumns[1]
-      .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].navigationEndpoint.browseEndpoint?.browseId,
+        .musicResponsiveListItemFlexColumnRenderer.text.runs[length - 3].navigationEndpoint.browseEndpoint?.browseId,
     }
-  } catch (err) {}
+  } catch (err) { }
 
   let thumbnailUrl;
   try {
     thumbnailUrl =
       content.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()
         ?.url;
-  } catch (err) {}
+  } catch (err) { }
 
   let duration;
   try {
@@ -149,7 +150,7 @@ export const parseMusicItem = (content: {
       label,
       totalSeconds: parseDuration(label),
     };
-  } catch (err) {}
+  } catch (err) { }
   let isExplicit;
   try {
     isExplicit =
@@ -184,26 +185,26 @@ export const parseSuggestionItem = (content: {
     youtubeId =
       content.playlistPanelVideoRenderer.navigationEndpoint.watchEndpoint
         .videoId;
-  } catch (err) {}
+  } catch (err) { }
 
   let title;
   try {
     title = content.playlistPanelVideoRenderer.title.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let artists;
   try {
     artists = listArtists(
       content.playlistPanelVideoRenderer.longBylineText.runs
     );
-  } catch (err) {}
+  } catch (err) { }
 
   let album;
   try {
     album = {
       name: content.playlistPanelVideoRenderer.longBylineText.runs[2].text
     }
-  } catch (err) {}
+  } catch (err) { }
 
   let isExplicit;
   try {
@@ -218,7 +219,7 @@ export const parseSuggestionItem = (content: {
   try {
     thumbnailUrl =
       content.playlistPanelVideoRenderer.thumbnail.thumbnails.pop()?.url;
-  } catch (err) {}
+  } catch (err) { }
 
   let duration;
   try {
@@ -228,7 +229,7 @@ export const parseSuggestionItem = (content: {
         content.playlistPanelVideoRenderer.lengthText.runs[0].text
       ),
     };
-  } catch (err) {}
+  } catch (err) { }
   return {
     youtubeId,
     title,
@@ -263,12 +264,12 @@ export const parsePlaylistItem = (
     playlistId =
       content.musicResponsiveListItemRenderer.navigationEndpoint.browseEndpoint
         .browseId;
-  } catch (err) {}
+  } catch (err) { }
   if (
     onlyOfficialPlaylists &&
     content.musicResponsiveListItemRenderer.flexColumns[1]
       .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text !==
-      'YouTube Music'
+    'YouTube Music'
   ) {
     return null;
   }
@@ -278,7 +279,7 @@ export const parsePlaylistItem = (
     title =
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let totalSongs;
   try {
@@ -288,14 +289,14 @@ export const parsePlaylistItem = (
       )[0],
       10
     );
-  } catch (err) {}
+  } catch (err) { }
 
   let thumbnailUrl;
   try {
     thumbnailUrl =
       content.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()
         ?.url;
-  } catch (err) {}
+  } catch (err) { }
 
   return {
     playlistId,
@@ -314,6 +315,17 @@ export const parsePlaylist = (
             musicShelfRenderer?: {
               contents: {
                 musicResponsiveListItemRenderer: {
+                  thumbnail?: {
+                    musicThumbnailRenderer: {
+                      thumbnail: {
+                        thumbnails: {
+                          url: string;
+                          width: number;
+                          height: number;
+                        }[]
+                      }
+                    }
+                  };
                   overlay: {
                     musicItemThumbnailOverlayRenderer: {
                       content: {
@@ -366,6 +378,17 @@ export const parsePlaylist = (
             musicPlaylistShelfRenderer?: {
               contents: {
                 musicResponsiveListItemRenderer: {
+                  thumbnail?: {
+                    musicThumbnailRenderer: {
+                      thumbnail: {
+                        thumbnails: {
+                          url: string;
+                          width: number;
+                          height: number;
+                        }[]
+                      }
+                    }
+                  };
                   overlay: {
                     musicItemThumbnailOverlayRenderer: {
                       content: {
@@ -494,72 +517,74 @@ export const parsePlaylist = (
   try {
     playlistId = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
       .buttons[1].musicPlayButtonRenderer?.playNavigationEndpoint.watchEndpoint.playlistId;
-  } catch (err) {}
+  } catch (err) { }
 
   let title;
   try {
     title = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
       .title.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let type;
   try {
     type = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
       .subtitle.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let year;
   try {
-    year =contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
+    year = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
       .subtitle.runs[2].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let thumbnailUrl;
   try {
     thumbnailUrl = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
       .thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url;
-  } catch (err) {}
+  } catch (err) { }
 
   let durationStr;
   try {
     durationStr = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
-    .secondSubtitle.runs[2].text;
-  } catch (err) {}
+      .secondSubtitle.runs[2].text;
+  } catch (err) { }
 
   let tracks: any[] = [];
   try {
     (contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer.contents[0].musicShelfRenderer ?? contents.twoColumnBrowseResultsRenderer.secondaryContents.sectionListRenderer.contents[0].musicPlaylistShelfRenderer)?.contents
-    .forEach((content) => {
-      let data: PlaylistTrack = {
-        id: '',
-        title: '',
-        durationStr: '',
-        artist: undefined,
-        album: undefined,
-      };
+      .forEach((content) => {
+        let data: PlaylistTrack = {
+          id: '',
+          title: '',
+          durationStr: '',
+          thumbnailUrl: '',
+          artist: undefined,
+          album: undefined,
+        };
 
-      if(!content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint?.watchEndpoint?.videoId) return;
+        if (!content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint?.watchEndpoint?.videoId) return;
 
-      data.id = content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint?.watchEndpoint?.videoId;
-      data.title = content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-      data.durationStr = content.musicResponsiveListItemRenderer.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs[0].text;
+        data.id = content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint?.watchEndpoint?.videoId;
+        data.title = content.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
+        data.durationStr = content.musicResponsiveListItemRenderer.fixedColumns[0].musicResponsiveListItemFixedColumnRenderer.text.runs[0].text;
+        data.thumbnailUrl = content.musicResponsiveListItemRenderer.thumbnail?.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url;
 
-      if(content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0].navigationEndpoint) {
-        data.artist = {
-          artistId: content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint?.browseId,
-          name: content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+        if (content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0].navigationEndpoint) {
+          data.artist = {
+            artistId: content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint?.browseId,
+            name: content.musicResponsiveListItemRenderer.flexColumns[1].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+          }
         }
-      }
 
-      if(content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0].navigationEndpoint) {
-        data.album = {
-          albumId: content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint?.browseId,
-          title: content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+        if (content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs?.[0].navigationEndpoint) {
+          data.album = {
+            albumId: content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint?.browseId,
+            title: content.musicResponsiveListItemRenderer.flexColumns[2].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+          }
         }
-      }
 
-      tracks.push(data);
-    })
+        tracks.push(data);
+      })
   } catch (err) {
     console.error(err);
   }
@@ -568,11 +593,11 @@ export const parsePlaylist = (
   try {
     const content = contents.twoColumnBrowseResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents[0].musicResponsiveHeaderRenderer
     author = {
-      id:  content.straplineTextOne?.runs[0].navigationEndpoint?.browseEndpoint.browseId,
+      id: content.straplineTextOne?.runs[0].navigationEndpoint?.browseEndpoint.browseId,
       name: content.straplineTextOne?.runs[0].text ?? "YouTube Music",
       thumbnailUrl: content.straplineThumbnail?.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url,
     }
-  } catch (err) {}
+  } catch (err) { }
 
   return {
     id: playlistId as string,
@@ -625,14 +650,14 @@ export const parseMusicInPlaylistItem = (content: {
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0]
         .navigationEndpoint.watchEndpoint.videoId;
-  } catch (err) {}
+  } catch (err) { }
 
   let title;
   try {
     title =
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   let artists;
   try {
@@ -640,22 +665,22 @@ export const parseMusicInPlaylistItem = (content: {
       content.musicResponsiveListItemRenderer.flexColumns[1]
         .musicResponsiveListItemFlexColumnRenderer.text.runs
     );
-  } catch (err) {}
+  } catch (err) { }
 
   let album;
   try {
     album = {
       name: content.musicResponsiveListItemRenderer.flexColumns[2]
-      .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
+        .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text
     }
-  } catch (err) {}
+  } catch (err) { }
 
   let thumbnailUrl;
   try {
     thumbnailUrl =
       content.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()
         ?.url;
-  } catch (err) {}
+  } catch (err) { }
 
   let duration;
   try {
@@ -668,7 +693,7 @@ export const parseMusicInPlaylistItem = (content: {
           .musicResponsiveListItemFixedColumnRenderer.text.runs[0].text
       ),
     };
-  } catch (err) {}
+  } catch (err) { }
 
   let isExplicit;
   try {
@@ -906,14 +931,14 @@ export const parseMusicInAlbumItem = (content: {
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0]
         .navigationEndpoint.watchEndpoint.videoId;
-  } catch (err) {}
+  } catch (err) { }
 
   let title;
   try {
     title =
       content.musicResponsiveListItemRenderer.flexColumns[0]
         .musicResponsiveListItemFlexColumnRenderer.text.runs[0].text;
-  } catch (err) {}
+  } catch (err) { }
 
   const artists: { name: string; id?: string }[] = [];
   try {
@@ -933,7 +958,7 @@ export const parseMusicInAlbumItem = (content: {
             .musicResponsiveListItemFlexColumnRenderer.text.runs[i].text,
         });
       }
-  } catch (err) {}
+  } catch (err) { }
 
   let duration;
   try {
@@ -946,7 +971,7 @@ export const parseMusicInAlbumItem = (content: {
           .musicResponsiveListItemFixedColumnRenderer.text.runs[0].text
       ),
     };
-  } catch (err) {}
+  } catch (err) { }
   let isExplicit;
   try {
     isExplicit =
@@ -1131,6 +1156,43 @@ const parseArtistsSuggestionsItem = (item: {
   };
 };
 
+export const parseVideoData = (
+  data: {
+    videoDetails: {
+      videoId: string;
+      title: string;
+      lengthSeconds: string;
+      channelId: string;
+      isOwnerViewing: boolean;
+      isCrawlable: boolean;
+      thumbnail: {
+        thumbnails: {
+          url: string;
+          width: number;
+          height: number;
+        }[];
+      };
+      allowRatings: boolean;
+      viewCount: string;
+      author: string;
+      isPrivate: boolean;
+      isUnpluggedCorpus: boolean;
+      musicVideoType?: string;
+      isLiveContent: boolean;
+    }
+  }
+): MusicVideoPlayable => {
+  const { videoDetails } = data;
+  return {
+    id: videoDetails.videoId,
+    title: videoDetails.title,
+    duration: parseInt(videoDetails.lengthSeconds, 10),
+    artist: { name: videoDetails.author, id: videoDetails.channelId },
+    thumbnailUrl: videoDetails.thumbnail.thumbnails.pop()?.url,
+    type: videoDetails.musicVideoType,
+  } satisfies MusicVideoPlayable;
+}
+
 export const parseArtistData = (
   body: {
     header: {
@@ -1186,6 +1248,38 @@ export const parseArtistData = (
                         };
                       }[];
                     };
+                    contents: {
+                      musicResponsiveListItemRenderer: {
+                        thumbnail: {
+                          musicThumbnailRenderer: {
+                            thumbnail: {
+                              thumbnails: {
+                                url: string;
+                                width: number;
+                                height: number;
+                              }[];
+                            }
+                          }
+                        };
+                        flexColumns: {
+                          musicResponsiveListItemFlexColumnRenderer: {
+                            text: {
+                              runs: {
+                                text: string;
+                                navigationEndpoint: {
+                                  browseEndpoint: {
+                                    browseId: string;
+                                  };
+                                  watchEndpoint: {
+                                    videoId: string;
+                                  };
+                                };
+                              }[];
+                            }
+                          }
+                        }[];
+                      }
+                    }[];
                   };
                   musicCarouselShelfRenderer: {
                     header: {
@@ -1260,13 +1354,7 @@ export const parseArtistData = (
     console.error("Couldn't get artist name", e);
   }
 
-  let description;
-  try {
-    description =
-      body.header.musicImmersiveHeaderRenderer.description.runs[0].text;
-  } catch (e) {
-    console.error("Couldn't get artist description", e);
-  }
+  let description = body.header.musicImmersiveHeaderRenderer?.description?.runs?.[0]?.text ?? '';
 
   const thumbnails: any[] = [];
   try {
@@ -1288,6 +1376,33 @@ export const parseArtistData = (
         .runs[0].navigationEndpoint.browseEndpoint.browseId;
   } catch (e) {
     console.error("Couldn't get artist songPlaylistId", e);
+  }
+
+  const tracks: MusicVideoPlayable[] = [];
+  try {
+    const { contents } =
+      body.contents.singleColumnBrowseResultsRenderer.tabs[0].tabRenderer
+        .content.sectionListRenderer.contents[0].musicShelfRenderer;
+    for (const item of contents) {
+      try {
+        tracks.push({
+          id: item.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.watchEndpoint.videoId,
+          title: item.musicResponsiveListItemRenderer.flexColumns[0].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text,
+          thumbnailUrl: item.musicResponsiveListItemRenderer.thumbnail.musicThumbnailRenderer.thumbnail.thumbnails.pop()?.url,
+          artist: { name: name as string, id: artistId },
+          album: {
+            name: item.musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].text as string,
+            id: item.musicResponsiveListItemRenderer.flexColumns[3].musicResponsiveListItemFlexColumnRenderer.text.runs[0].navigationEndpoint.browseEndpoint.browseId,
+          },
+          type: "song",
+          duration: 0,
+        } satisfies MusicVideoPlayable);
+      } catch (e) {
+        console.log("Skipping track", e);
+      }
+    }
+  } catch (e) {
+    console.error("Couldn't get tracks", e);
   }
 
   const albums: AlbumPreview[] = [];
@@ -1356,7 +1471,8 @@ export const parseArtistData = (
     songsPlaylistId,
     suggestedArtists,
     subscribers,
-  };
+    songs: tracks,
+  } satisfies Artist;
 };
 
 export const parseArtistSearchResult = (content: {

@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 import context from './context.js';
 import { PlaylistPreview } from './models.js';
 import { parsePlaylistItem } from './parsers.js';
@@ -33,15 +33,15 @@ export async function SearchForPlaylists(
     onlyOfficialPlaylists?: boolean;
   }
 ): Promise<PlaylistPreview[]> {
-  const response = await got.post(
+  const response = await axios.post(
     'https://music.youtube.com/youtubei/v1/search',
     {
-      json: {
-        ...context.body,
-        params: 'EgWKAQIoAWoKEAoQAxAEEAUQCQ%3D%3D',
-        query,
-      },
-      searchParams: {
+      ...context.body,
+      params: 'EgWKAQIoAWoKEAoQAxAEEAUQCQ%3D%3D',
+      query,
+    },
+    {
+      params: {
         alt: 'json',
         key: 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
       },
@@ -55,7 +55,7 @@ export async function SearchForPlaylists(
 
   try {
     return parseSearchPlaylistsBody(
-      JSON.parse(response.body),
+      response.data,
       options?.onlyOfficialPlaylists ?? false
     );
   } catch (e) {

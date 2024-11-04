@@ -1,7 +1,7 @@
-import got from 'got';
 import { MusicVideo } from './models.js';
 import { parseMusicItem } from './parsers.js';
 import context from './context.js';
+import axios from 'axios';
 
 export const parseSearchMusicsBody = (body: {
   contents: any;
@@ -34,21 +34,14 @@ export async function SearchForMusicVideos(query: string): Promise<MusicVideo[]>
     validationStatus: "VALID",
   };
 
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    'Origin': 'https://music.youtube.com',
-  };
-
-  const options: any = {
-    method: 'POST',
-    headers,
-    json: body,
-    responseType: 'json',
-  };
-
   try {
-    const response = await got(url, options);    
-    return parseSearchMusicsBody(response.body as any);
+    const response = await axios.post(url, body, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        'Origin': 'https://music.youtube.com'
+      }
+    });    
+    return parseSearchMusicsBody(response.data as any);
   } catch (error) {
     console.error('Error fetching data:', error);
     return [];

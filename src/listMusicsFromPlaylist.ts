@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 import context from './context.js';
 import { MusicVideo } from './models.js';
 import { parseMusicInPlaylistItem } from './parsers.js';
@@ -49,14 +49,14 @@ export async function ListMusicVideosFromPlaylist(
   }
 
   try {
-    const response = await got.post(
+    const response = await axios.post(
       'https://music.youtube.com/youtubei/v1/browse',
       {
-        json: {
-          ...context.body,
-          browseId,
-        },
-        searchParams: {
+        ...context.body,
+        browseId,
+      },
+      {
+        params: {
           alt: 'json',
           key: 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
         },
@@ -68,7 +68,7 @@ export async function ListMusicVideosFromPlaylist(
       }
     );
 
-    return parseListMusicsFromPlaylistBody(JSON.parse(response.body));
+    return parseListMusicsFromPlaylistBody(response.data);
   } catch (error) {
     console.error(`Error in listMusicsFromPlaylist: ${error}`);
     return [];

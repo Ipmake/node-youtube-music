@@ -52,6 +52,7 @@ export interface Artist {
   description?: string;
   thumbnails?: any[];
   songsPlaylistId?: string;
+  songs?: MusicVideoPlayable[];
   albums?: AlbumPreview[];
   singles?: AlbumPreview[];
   suggestedArtists?: ArtistPreview[];
@@ -84,6 +85,17 @@ export interface PlaylistTrack {
   id: string;
   title: string;
   durationStr: string;
+  thumbnailUrl?: string;
   artist?: ArtistPreview;
   album?: AlbumPreview;
+}
+
+export interface MusicVideoPlayable {
+  id?: string;
+  title?: string;
+  thumbnailUrl?: string;
+  artist?: {name:string; id?:string};
+  album?: {name:string; id?:string}
+  type?: string;
+  duration?: number;
 }

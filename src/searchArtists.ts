@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 import context from './context.js';
 import { ArtistPreview } from './models.js';
 import { parseArtistSearchResult } from './parsers.js';
@@ -30,15 +30,15 @@ export async function SearchForArtists(
   }
 ): Promise<ArtistPreview[]> {
   try {
-    const response = await got.post(
+    const response = await axios.post(
       'https://music.youtube.com/youtubei/v1/search',
       {
-        json: {
-          ...context.body,
-          params: 'EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D',
-          query,
-        },
-        searchParams: {
+        ...context.body,
+        params: 'EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D',
+        query,
+      }, 
+      {
+        params: {
           alt: 'json',
           key: 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
         },
@@ -51,7 +51,7 @@ export async function SearchForArtists(
       }
     );
 
-    return parseArtistsSearchBody(JSON.parse(response.body));
+    return parseArtistsSearchBody(response.data);
   } catch (e) {
     console.error(e);
     return [];

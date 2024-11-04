@@ -1,4 +1,4 @@
-import got from 'got';
+import axios from 'axios';
 import context from './context.js';
 import { AlbumPreview } from './models.js';
 import { parseAlbumItem } from './parsers.js';
@@ -25,15 +25,15 @@ export async function SearchForAlbum(
   query: string
 ): Promise<AlbumPreview[]> {
   try {
-    const response = await got.post(
+    const response = await axios.post(
       'https://music.youtube.com/youtubei/v1/search',
       {
-        json: {
-          ...context.body,
-          params: 'EgWKAQIYAWoKEAkQAxAEEAUQCg%3D%3D',
-          query,
-        },
-        searchParams: {
+        ...context.body,
+        params: 'EgWKAQIYAWoKEAkQAxAEEAUQCg%3D%3D',
+        query
+      },
+      {
+        params: {
           alt: 'json',
           key: 'AIzaSyC9XL3ZjWddXya6X74dJoCTL-WEYFDNX30',
         },
@@ -45,7 +45,7 @@ export async function SearchForAlbum(
       }
     );
 
-    return parseSearchAlbumsBody(JSON.parse(response.body));
+    return parseSearchAlbumsBody(response.data);
   } catch (e) {
     console.error(e);
     return [];
