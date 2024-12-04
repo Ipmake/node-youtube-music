@@ -5,21 +5,26 @@ import { parseArtistSearchResult } from './parsers.js';
 
 
 export const parseArtistsSearchBody = (body: any): ArtistPreview[] => {
-  const { contents } =
-    body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
-      .musicShelfRenderer;
-  const results: ArtistPreview[] = [];
-  contents.forEach((content: any) => {
-    try {
-      const artist = parseArtistSearchResult(content);
-      if (artist) {
-        results.push(artist);
+  try {
+    const { contents } =
+      body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
+        .musicShelfRenderer;
+    const results: ArtistPreview[] = [];
+    contents.forEach((content: any) => {
+      try {
+        const artist = parseArtistSearchResult(content);
+        if (artist) {
+          results.push(artist);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  });
-  return results;
+    });
+    return results;
+  } catch (err) {
+    console.log("Failed to searchArtists", err)
+    return [];
+  }
 };
 
 export async function SearchForArtists(
@@ -36,7 +41,7 @@ export async function SearchForArtists(
         ...context.body,
         params: 'EgWKAQIgAWoKEAMQBBAJEAoQBQ%3D%3D',
         query,
-      }, 
+      },
       {
         params: {
           alt: 'json',

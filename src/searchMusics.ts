@@ -6,21 +6,26 @@ import axios from 'axios';
 export const parseSearchMusicsBody = (body: {
   contents: any;
 }): MusicVideo[] => {
-  const { contents } =
-    body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
-      .musicShelfRenderer;
-  const results: MusicVideo[] = [];
-  contents.forEach((content: any) => {
-    try {
-      const song = parseMusicItem(content);
-      if (song) {
-        results.push(song);
+  try {
+    const { contents } =
+      body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
+        .musicShelfRenderer;
+    const results: MusicVideo[] = [];
+    contents.forEach((content: any) => {
+      try {
+        const song = parseMusicItem(content);
+        if (song) {
+          results.push(song);
+        }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
-  });
-  return results;
+    });
+    return results;
+  } catch (err) {
+    console.log("Failed to searchMusics", err)
+    return [];
+  }
 };
 
 export async function SearchForMusicVideos(query: string): Promise<MusicVideo[]> {
@@ -40,7 +45,7 @@ export async function SearchForMusicVideos(query: string): Promise<MusicVideo[]>
         'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
         'Origin': 'https://music.youtube.com'
       }
-    });    
+    });
     return parseSearchMusicsBody(response.data as any);
   } catch (error) {
     console.error('Error fetching data:', error);

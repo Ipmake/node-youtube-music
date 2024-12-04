@@ -7,24 +7,29 @@ export const parseSearchPlaylistsBody = (
   body: any,
   onlyOfficialPlaylists: boolean
 ): PlaylistPreview[] => {
-  const contents =
-    body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
-      .musicShelfRenderer?.contents;
-  if (!contents) {
+  try {
+    const contents =
+      body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
+        .musicShelfRenderer?.contents;
+    if (!contents) {
+      return [];
+    }
+    const results: PlaylistPreview[] = [];
+    contents.forEach((content: any) => {
+      try {
+        const playlist = parsePlaylistItem(content, onlyOfficialPlaylists);
+        if (playlist) {
+          results.push(playlist);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    return results;
+  } catch (err) {
+    console.log("Failed to searchPlaylists", err)
     return [];
   }
-  const results: PlaylistPreview[] = [];
-  contents.forEach((content: any) => {
-    try {
-      const playlist = parsePlaylistItem(content, onlyOfficialPlaylists);
-      if (playlist) {
-        results.push(playlist);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  });
-  return results;
 };
 
 export async function SearchForPlaylists(

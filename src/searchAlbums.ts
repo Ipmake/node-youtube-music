@@ -4,21 +4,26 @@ import { AlbumPreview } from './models.js';
 import { parseAlbumItem } from './parsers.js';
 
 export const parseSearchAlbumsBody = (body: any): AlbumPreview[] => {
-  const { contents } =
-    body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
-      .musicShelfRenderer;
-  const results: AlbumPreview[] = [];
-  contents.forEach((content: any) => {
-    try {
-      const album = parseAlbumItem(content);
-      if (album) {
-        results.push(album);
+  try {
+    const { contents } =
+      body.contents.tabbedSearchResultsRenderer.tabs[0].tabRenderer.content.sectionListRenderer.contents.pop()
+        .musicShelfRenderer;
+    const results: AlbumPreview[] = [];
+    contents.forEach((content: any) => {
+      try {
+        const album = parseAlbumItem(content);
+        if (album) {
+          results.push(album);
+        }
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  });
-  return results;
+    });
+    return results;
+  } catch (err) {
+    console.log("Failed to searchAlbums", err)
+    return [];
+  }
 };
 
 export async function SearchForAlbum(
